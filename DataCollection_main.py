@@ -10,20 +10,30 @@ if __name__ == '__main__':
     Collecting data
     Function returns single dictionary containing sub-dictionaries with X number of game data
     '''
-    #Ask for new key (Riot API requires new key every 24 hours)
-    key = input("Enter updated API key:\n")
-    rank = input("Enter desired rank:\n")
-    num_games = input("Enter number of games:\n")
+    key = "RGAPI-8fe0836a-b6f2-4ed9-b11b-8822129ed60f"
+    #key = input("Enter API key:\n")
     
-    print("Processing data for following variables:")
-    print("Ranks targeted: " + rank)
-    print("Number of games retrieved: " + num_games)
+    '''
+    rank = input("Enter desired rank:\n")
+    '''
+    collected_data = API_Pull.API_Pull(key, "recent")
     
     '''
     Pushing data to an Excel sheet
     '''
-    try:
-        print("penis")
-        
-    except:
-        print("Excel push failed")
+    file_name = input("Enter file name:\n")
+    
+    #if file != exist, create new file
+    Excel_Push.createFile(file_name, collected_data)
+    
+    #else append
+    
+    '''
+    deaths = {}
+    deaths["roundNum"] = {}
+    deaths["roundNum"]["playerID"] = ["xD", "foreskin"]
+    matchData = ["penis", "hehe", deaths]
+    sample_data = [matchData]
+    
+    print(Excel_Push.formatData(sample_data))
+    '''
