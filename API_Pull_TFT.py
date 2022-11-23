@@ -110,10 +110,32 @@ def highEloGames(rank, num_games):
     return unique_gameIDs
 
 
+'''
+For this function, num_games serves as the goal sample size
+If the function is unable to 
 
-def lowEloGames(rank, division, num_games):
-    response = requests.get("https://na1.api.riotgames.com/tft/league/v1/entries/" + rank + "/" + division + "?page=1&api_key=" + tft_key)
+Need to handle if not enough players to sample
+'''
+def lowEloGames(rank, division, sample_size, num_games):
+    page_num = 1
+    response = requests.get("https://na1.api.riotgames.com/tft/league/v1/entries/" + rank + "/" + division + "?page=" + str(page_num) + "&api_key=" + tft_key)
     
+    unique_gameIDs = []
+    used_players = []
+    for x in range(sample_size):
+        flag = False
+        
+        while flag == False:
+            random_index = random.randint(0, len(response.json()) - 1)
+            if random_index not in used_players:
+                flag = True
+        
+        #basically pretty similar to highEloGames
+        
+        
+        if len(used_players) == len(response.json()):
+            page_num += 1
+            response = requests.get("https://na1.api.riotgames.com/tft/league/v1/entries/" + rank + "/" + division + "?page=" + str(page_num) + "&api_key=" + tft_key)
     
     return
 
