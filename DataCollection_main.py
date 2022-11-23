@@ -1,4 +1,4 @@
-import API_Pull
+import API_Pull_TFT
 import Excel_Push
 
 '''
@@ -10,21 +10,15 @@ if __name__ == '__main__':
     Collecting data
     Function returns single dictionary containing sub-dictionaries with X number of game data
     '''
-    key = "RGAPI-8fe0836a-b6f2-4ed9-b11b-8822129ed60f"
-    #key = input("Enter API key:\n")
     
-    '''
-    rank = input("Enter desired rank:\n")
-    '''
-    collected_data = API_Pull.API_Pull(key, "recent")
     
     '''
     Pushing data to an Excel sheet
     '''
-    file_name = input("Enter file name:\n")
+    #file_name = input("Enter file name:\n")
     
     #if file != exist, create new file
-    Excel_Push.createFile(file_name, collected_data)
+    #Excel_Push.createFile(file_name, collected_data)
     
     #else append
     
@@ -37,3 +31,7 @@ if __name__ == '__main__':
     
     print(Excel_Push.formatData(sample_data))
     '''
+    
+    
+    print(API_Pull_TFT.jsonText(API_Pull_TFT.highEloGames("challenger", 10)))
+    print("penis")

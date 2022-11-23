@@ -8,6 +8,9 @@ This script focuses on pulling game data from the Riot Games API
     Riot Games API uses rate limits on API requests
         20 requests every 1 seconds
         100 requests every 2 minutes
+        
+        
+THIS IS FOR VALORANT
 '''
 
 def test_pull(key):
