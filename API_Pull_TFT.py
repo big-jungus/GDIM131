@@ -10,6 +10,10 @@ import random
 dev_key = "RGAPI-ebe0d733-b653-45a9-a554-6f7547afc09c"
 tft_key = "RGAPI-eaba5c4f-0b41-40d7-8325-9a8cc6bad130"
 
+highElo = ["challenger", "grandmaster", "master"]
+lowElo = ["IRON", "BRONZE", "SILVER", "GOLD", "PLATNIUM", "DIAMOND"]
+divisions  = ["I", "II", "III", "IV"]
+
 '''
 Use matchID's as dictionary keys
 
@@ -48,9 +52,16 @@ def testFunction(matchID):
 
 
 
-def dataCollection():
-    #loop through each group
-    return
+def dataCollection(sample_size, num_games):
+    data = {}
+    #high elo collection
+    for rank in highElo:
+        
+        gameIDs = highEloGames(rank, num_games)
+
+    #low elo collection
+    
+    return data
 
 
 
@@ -83,7 +94,7 @@ def matchHistory(leagueID, num_games):
 
 def highEloGames(rank, num_games):
     if rank == "challenger":
-        response = requests.get("https://na1.api.riotgames.com/tft/league/v1/grandmaster?api_key=" + tft_key)
+        response = requests.get("https://na1.api.riotgames.com/tft/league/v1/challenger?api_key=" + tft_key)
     elif rank == "grandmaster":
         response = requests.get("https://na1.api.riotgames.com/tft/league/v1/grandmaster?api_key=" + tft_key)
     elif rank == "master":
@@ -128,16 +139,24 @@ def lowEloGames(rank, division, sample_size, num_games):
         while flag == False:
             random_index = random.randint(0, len(response.json()) - 1)
             if random_index not in used_players:
+	used_players.append(random_index)
                 flag = True
         
         #basically pretty similar to highEloGames
+        #might need "entries" key, might not
+        player  = response.json()[random_index]
+        history = matchHistory(player["summonerName"], num_games)
+        rand_game = jsonText(history[random.randint(0, num_games - 1)])
         
+        if rand_game not in unique_gameIDs:
+            unique_gameIDs.append(rand_game)
         
         if len(used_players) == len(response.json()):
             page_num += 1
             response = requests.get("https://na1.api.riotgames.com/tft/league/v1/entries/" + rank + "/" + division + "?page=" + str(page_num) + "&api_key=" + tft_key)
+            used_players = []
     
-    return
+    return unique_gameIDs
 
 
 
