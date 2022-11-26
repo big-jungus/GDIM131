@@ -59,8 +59,17 @@ def dataCollection(sample_size, num_games):
         
         gameIDs = highEloGames(rank, num_games)
 
+        '''
+        gameIDs getting collected as something like ""\"NA_123456"\"", so needs to be cleaned to just have the NA_123456 portion
+        Plug the list of gameIDs into matchOrganize, which should sort the data into a dictionary
+        I didn't include the rank in the game dict, so add a dict entry with key "rank" and value of the rank variable from the for loop
+        Pass each game dict into the data dict
+        '''
+
     #low elo collection
-    
+    '''
+    Should be pretty similar logic to the high elo collection
+    '''
     return data
 
 
