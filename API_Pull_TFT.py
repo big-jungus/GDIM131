@@ -7,7 +7,7 @@ import requests
 import json
 import random
 
-dev_key = "RGAPI-ebe0d733-b653-45a9-a554-6f7547afc09c"
+dev_key = "RGAPI-98651f70-22c9-48f6-babf-bfde8e955e20"
 tft_key = "RGAPI-eaba5c4f-0b41-40d7-8325-9a8cc6bad130"
 
 highElo = ["challenger", "grandmaster", "master"]
