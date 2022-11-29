@@ -14,6 +14,7 @@ tft_key = "RGAPI-eaba5c4f-0b41-40d7-8325-9a8cc6bad130"
 highElo = ["challenger", "grandmaster", "master"]
 lowElo = ["IRON", "BRONZE", "SILVER", "GOLD", "PLATNIUM", "DIAMOND"]
 divisions  = ["I", "II", "III", "IV"]
+setNum = 7
 
 '''
 Use matchID's as dictionary keys
@@ -47,9 +48,13 @@ jsonText(jsonObj): jsonObj to string
     returns string
 '''
 def testFunction(matchID):
-    match1_response = requests.get("https://americas.api.riotgames.com/tft/match/v1/matches/" + matchID + "?api_key=" + tft_key)
+    gameData = matchOrganize(matchData(matchID))
+    gameData["matchID"] = "Fard"
+    gameData["rank"] = "Penis"
+    gameData["division"] = "I"
     
-    return matchOrganize(match1_response.json())
+    print(gameData)
+    return gameData
 
 
 
@@ -67,8 +72,12 @@ def dataCollection(sample_size, num_games):
         Pass each game dict into the data dict
         '''
         for game in gameIDs:
-            gameData = matchOrganize(matchData(game))
-            data[game] = gameData
+            if matchData(game)["info"]["tft_set_number"] == setNum:
+                gameData = matchOrganize(matchData(game))
+                gameData["matchID"] = game
+                gameData["rank"] = rank
+                gameData["division"] = "I"
+                data[game] = gameData
         
 
     #low elo collection
@@ -78,6 +87,8 @@ def dataCollection(sample_size, num_games):
             
             for game in gameIDs:
                 gameData = matchOrganize(matchData(game))
+                gameData["rank"] = rank
+                gameData["division"] = division
                 data[game] = gameData
     
     return data
@@ -185,22 +196,23 @@ def lowEloGames(rank, division, sample_size, num_games):
 
 def matchOrganize(matchData):
     matchDict = {}
+    matchDict["players"] = {}
     for player in matchData["info"]["participants"]:
-        matchDict[jsonText(player["puuid"])] = {}
-        matchDict[jsonText(player["puuid"])]["placement"] = jsonText(player["placement"])
-        matchDict[jsonText(player["puuid"])]["level"] = jsonText(player["level"])
+        matchDict["players"][jsonText(player["puuid"])] = {}
+        matchDict["players"][jsonText(player["puuid"])]["placement"] = jsonText(player["placement"])
+        matchDict["players"][jsonText(player["puuid"])]["level"] = jsonText(player["level"])
         
         #For the following two data points, they will be stored in tuples, containing (name, tier)
         unit_list = []
         for unit in player["units"]:
             unit_list.append((jsonText(unit["character_id"]), jsonText(unit["tier"])))
-        matchDict[jsonText(player["puuid"])]["units"] = unit_list
+        matchDict["players"][jsonText(player["puuid"])]["units"] = unit_list
         
         trait_list = []
         for trait in player["traits"]:
             if int(jsonText(trait["tier_current"])) != 0:
                 trait_list.append((jsonText(trait["name"]), jsonText(trait["tier_current"])))
-        matchDict[jsonText(player["puuid"])]["traits"] = trait_list
+        matchDict["players"][jsonText(player["puuid"])]["traits"] = trait_list
         
     return matchDict
 

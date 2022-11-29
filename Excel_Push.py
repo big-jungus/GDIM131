@@ -23,16 +23,19 @@ def appendData(file_name, data):
     return
 
 def formatData(data):
-    dataframe = {"Map": list(), "Average Rank": list(), "Pre/Post": list(), "Location": list()}
+    dataframe = {"Rank": list(), "Division": list(), "MatchID": list(), "PlayerID": list(), "Placement": list(), "Level": list(), "Units": list(), "Traits": list()}
     
     for singleMatch in data:
-        for roundNum in singleMatch[2]:
-            for playerID in singleMatch[2][roundNum]:
-                dataframe["Map"].append(singleMatch[0])
-                dataframe["Average Rank"].append(singleMatch[1])
-                
-                dataframe["Pre/Post"].append(singleMatch[2][roundNum][playerID][0])
-                dataframe["Location"].append(singleMatch[2][roundNum][playerID][1])
+        for player in singleMatch["players"]:
+            dataframe["Rank"].append(singleMatch["rank"])
+            dataframe["Division"].append(singleMatch["division"])
+            dataframe["MatchID"].append(singleMatch["matchID"])
+            
+            dataframe["PlayerID"].append(player)
+            dataframe["Placement"].append(singleMatch["players"][player]["placement"])
+            dataframe["Level"].append(singleMatch["players"][player]["level"])
+            dataframe["Units"].append(singleMatch["players"][player]["units"])
+            dataframe["Traits"].append(singleMatch["players"][player]["traits"])
     
     df = pandas.DataFrame(data=dataframe)
     return df
