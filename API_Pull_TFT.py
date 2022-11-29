@@ -7,7 +7,8 @@ import requests
 import json
 import random
 
-dev_key = "RGAPI-98651f70-22c9-48f6-babf-bfde8e955e20"
+
+dev_key = "RGAPI-ab777641-f21a-42b2-94a7-19fc650c0a44"
 tft_key = "RGAPI-eaba5c4f-0b41-40d7-8325-9a8cc6bad130"
 
 highElo = ["challenger", "grandmaster", "master"]
@@ -58,18 +59,27 @@ def dataCollection(sample_size, num_games):
     for rank in highElo:
         
         gameIDs = highEloGames(rank, num_games)
-
+        
         '''
         gameIDs getting collected as something like ""\"NA_123456"\"", so needs to be cleaned to just have the NA_123456 portion
         Plug the list of gameIDs into matchOrganize, which should sort the data into a dictionary
         I didn't include the rank in the game dict, so add a dict entry with key "rank" and value of the rank variable from the for loop
         Pass each game dict into the data dict
         '''
+        for game in gameIDs:
+            gameData = matchOrganize(matchData(game))
+            data[game] = gameData
+        
 
     #low elo collection
-    '''
-    Should be pretty similar logic to the high elo collection
-    '''
+    for rank in lowElo:
+        for division in divisions:
+            gameIDs = lowEloGames(rank, division, sample_size, num_games)
+            
+            for game in gameIDs:
+                gameData = matchOrganize(matchData(game))
+                data[game] = gameData
+    
     return data
 
 
@@ -78,6 +88,7 @@ def idTransfer(leagueID):
     properID = leagueID.replace(" ", "%20")
     response = requests.get("https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + properID + "?api_key=" + dev_key)
     
+    #print(jsonText(response.json()))
     return jsonText(response.json()["puuid"])
 
 
@@ -140,6 +151,8 @@ def lowEloGames(rank, division, sample_size, num_games):
     page_num = 1
     response = requests.get("https://na1.api.riotgames.com/tft/league/v1/entries/" + rank + "/" + division + "?page=" + str(page_num) + "&api_key=" + tft_key)
     
+    print("Collecting " + rank + " " + division + " games. This will take a while.")
+    
     unique_gameIDs = []
     used_players = []
     for x in range(sample_size):
@@ -148,7 +161,7 @@ def lowEloGames(rank, division, sample_size, num_games):
         while flag == False:
             random_index = random.randint(0, len(response.json()) - 1)
             if random_index not in used_players:
-	used_players.append(random_index)
+                used_players.append(random_index)
                 flag = True
         
         #basically pretty similar to highEloGames
@@ -159,6 +172,7 @@ def lowEloGames(rank, division, sample_size, num_games):
         
         if rand_game not in unique_gameIDs:
             unique_gameIDs.append(rand_game)
+            print("Entry " + str(x) + " out of " + str(sample_size) + "possible entries in " + rank + " " + division)
         
         if len(used_players) == len(response.json()):
             page_num += 1
@@ -190,6 +204,11 @@ def matchOrganize(matchData):
         
     return matchDict
 
+
+
+def matchData(matchID):
+    response = requests.get("https://americas.api.riotgames.com/tft/match/v1/matches/" + matchID + "?api_key=" + tft_key)
+    return response.json()
 
 
 def jsonText(jsonObj):
