@@ -164,7 +164,7 @@ def highEloGames(rank, num_games):
     for player in response.json()["entries"]:
         print("Entry " + str(response.json()["entries"].index(player) + 1) + " out of " + str(len(response.json()["entries"])) + " possible entries")
         
-        time.sleep(0.5)
+        time.sleep(1)
         
         try:
             history = matchHistory(player["summonerName"], num_games)
@@ -210,7 +210,7 @@ def lowEloGames(rank, division, sample_size, num_games):
         #basically pretty similar to highEloGames
         #might need "entries" key, might not
         
-        time.sleep(0.5)
+        time.sleep(1)
         
         try:
             player  = response.json()[random_index]
