@@ -23,19 +23,21 @@ def appendData(file_name, data):
     return
 
 def formatData(data):
-    dataframe = {"Rank": list(), "Division": list(), "MatchID": list(), "PlayerID": list(), "Placement": list(), "Level": list(), "Units": list(), "Traits": list()}
-    
-    for singleMatch in data:
-        for player in singleMatch["players"]:
-            dataframe["Rank"].append(singleMatch["rank"])
-            dataframe["Division"].append(singleMatch["division"])
-            dataframe["MatchID"].append(singleMatch["matchID"])
+    dataframe = {"Set_Num": list(), "Rank": list(), "Division": list(), "MatchID": list(), "PlayerID": list(), "Placement": list(), "Level": list(), "Units": list(), "Traits": list()}
+
+    for singleMatch in data:        
+        for player in data[singleMatch]["players"]:
+            dataframe["Set_Num"].append(data[singleMatch]["set_num"])
+            dataframe["Rank"].append(data[singleMatch]["rank"])
+            dataframe["Division"].append(data[singleMatch]["division"])
+            dataframe["MatchID"].append(data[singleMatch]["matchID"])
             
             dataframe["PlayerID"].append(player)
-            dataframe["Placement"].append(singleMatch["players"][player]["placement"])
-            dataframe["Level"].append(singleMatch["players"][player]["level"])
-            dataframe["Units"].append(singleMatch["players"][player]["units"])
-            dataframe["Traits"].append(singleMatch["players"][player]["traits"])
+            dataframe["Placement"].append(data[singleMatch]["players"][player]["placement"])
+            dataframe["Level"].append(data[singleMatch]["players"][player]["level"])
+            dataframe["Units"].append(data[singleMatch]["players"][player]["units"])
+            dataframe["Traits"].append(data[singleMatch]["players"][player]["traits"])
     
     df = pandas.DataFrame(data=dataframe)
+    print(df)
     return df

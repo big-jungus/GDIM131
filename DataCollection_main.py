@@ -13,10 +13,12 @@ if __name__ == '__main__':
     sample_size = 100
     num_games = 10
     
-    #print(Excel_Push.formatData(API_Pull_TFT.testFunction("NA1_4492623739"))["MatchID"])
+    #print(API_Pull_TFT.matchData("NA1_4492623739"))
+    #print(API_Pull_TFT.matchOrganize((API_Pull_TFT.matchData("NA1_4492623739"))))
 
-    
     allData = API_Pull_TFT.dataCollection(sample_size, num_games)
+    #Excel_Push.formatData(API_Pull_TFT.testFunction("challenger", 10))
+    
     
     '''
     Pushing data to an Excel sheet

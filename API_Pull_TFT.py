@@ -6,13 +6,14 @@ FOR PUUIDs MAKE SURE TO USE THE DEV_KEY
 import requests
 import json
 import random
+import time
 
 
 dev_key = "RGAPI-ab777641-f21a-42b2-94a7-19fc650c0a44"
 tft_key = "RGAPI-eaba5c4f-0b41-40d7-8325-9a8cc6bad130"
 
 highElo = ["challenger", "grandmaster", "master"]
-lowElo = ["IRON", "BRONZE", "SILVER", "GOLD", "PLATNIUM", "DIAMOND"]
+lowElo = ["IRON", "BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND"]
 divisions  = ["I", "II", "III", "IV"]
 setNum = 7
 
@@ -47,14 +48,25 @@ matchOrganize(matchJSON): JSON to dict
 jsonText(jsonObj): jsonObj to string
     returns string
 '''
-def testFunction(matchID):
-    gameData = matchOrganize(matchData(matchID))
-    gameData["matchID"] = "Fard"
-    gameData["rank"] = "Penis"
-    gameData["division"] = "I"
+def testFunction(rank, num_games):
+    data = {}
     
-    print(gameData)
-    return gameData
+    gameIDs = highEloGames(rank, num_games)
+    
+    for game in gameIDs:
+            matchID = game.replace('"','')
+            time.sleep(0.5)
+            try:
+                print("Data found for " + matchID)
+                gameData = matchOrganize(matchData(matchID))
+                gameData["matchID"] = matchID
+                gameData["rank"] = rank
+                gameData["division"] = "I"
+                data[game] = gameData
+            except KeyError:
+                print("Data not found for " + matchID)
+    
+    return data
 
 
 
@@ -72,12 +84,17 @@ def dataCollection(sample_size, num_games):
         Pass each game dict into the data dict
         '''
         for game in gameIDs:
-            if matchData(game)["info"]["tft_set_number"] == setNum:
-                gameData = matchOrganize(matchData(game))
-                gameData["matchID"] = game
+            matchID = game.replace('"','')
+            time.sleep(1)
+            try:
+                print("Data found for " + matchID)
+                gameData = matchOrganize(matchData(matchID))
+                gameData["matchID"] = matchID
                 gameData["rank"] = rank
                 gameData["division"] = "I"
                 data[game] = gameData
+            except KeyError:
+                print("Data not found for " + matchID)
         
 
     #low elo collection
@@ -86,10 +103,17 @@ def dataCollection(sample_size, num_games):
             gameIDs = lowEloGames(rank, division, sample_size, num_games)
             
             for game in gameIDs:
-                gameData = matchOrganize(matchData(game))
-                gameData["rank"] = rank
-                gameData["division"] = division
-                data[game] = gameData
+                matchID = game.replace('"','')
+                time.sleep(1)
+                try:
+                    print("Data found for " + matchID)
+                    gameData = matchOrganize(matchData(matchID))
+                    gameData["matchID"] = matchID
+                    gameData["rank"] = rank
+                    gameData["division"] = division
+                    data[game] = gameData
+                except KeyError:
+                    print("Data not found for " + matchID)
     
     return data
 
@@ -140,12 +164,20 @@ def highEloGames(rank, num_games):
     for player in response.json()["entries"]:
         print("Entry " + str(response.json()["entries"].index(player) + 1) + " out of " + str(len(response.json()["entries"])) + " possible entries")
         
-        history = matchHistory(player["summonerName"], num_games)
+        time.sleep(0.5)
         
-        rand_game = jsonText(history[random.randint(0, num_games - 1)])
-        
-        if rand_game not in unique_gameIDs:
-            unique_gameIDs.append(rand_game)
+        try:
+            history = matchHistory(player["summonerName"], num_games)
+            
+            rand_game = jsonText(history[random.randint(0, num_games - 1)])
+            
+            if rand_game not in unique_gameIDs:
+                unique_gameIDs.append(rand_game)
+        except KeyError:
+            print("Invalid Game.")
+            
+        if len(unique_gameIDs) == 100:
+            break
     
     print("Found " + str(len(unique_gameIDs)) + " games in " + rank)
     
@@ -177,13 +209,22 @@ def lowEloGames(rank, division, sample_size, num_games):
         
         #basically pretty similar to highEloGames
         #might need "entries" key, might not
-        player  = response.json()[random_index]
-        history = matchHistory(player["summonerName"], num_games)
-        rand_game = jsonText(history[random.randint(0, num_games - 1)])
         
-        if rand_game not in unique_gameIDs:
-            unique_gameIDs.append(rand_game)
-            print("Entry " + str(x) + " out of " + str(sample_size) + "possible entries in " + rank + " " + division)
+        time.sleep(0.5)
+        
+        try:
+            player  = response.json()[random_index]
+            history = matchHistory(player["summonerName"], num_games)
+            rand_game = jsonText(history[random.randint(0, len(history) - 1)])
+            
+            if rand_game not in unique_gameIDs:
+                unique_gameIDs.append(rand_game)
+                print("Entry " + str(x) + " out of " + str(sample_size) + " possible entries in " + rank + " " + division)
+        except KeyError:
+            print("Invalid Game")
+        
+        if len(unique_gameIDs) == 100:
+            break
         
         if len(used_players) == len(response.json()):
             page_num += 1
@@ -197,7 +238,10 @@ def lowEloGames(rank, division, sample_size, num_games):
 def matchOrganize(matchData):
     matchDict = {}
     matchDict["players"] = {}
+    matchDict["set_num"] = jsonText(matchData["info"]["tft_set_number"])
+    
     for player in matchData["info"]["participants"]:
+        
         matchDict["players"][jsonText(player["puuid"])] = {}
         matchDict["players"][jsonText(player["puuid"])]["placement"] = jsonText(player["placement"])
         matchDict["players"][jsonText(player["puuid"])]["level"] = jsonText(player["level"])
