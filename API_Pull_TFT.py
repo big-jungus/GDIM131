@@ -9,7 +9,7 @@ import random
 import time
 
 
-dev_key = "RGAPI-ab777641-f21a-42b2-94a7-19fc650c0a44"
+dev_key = "RGAPI-e222e5c1-e819-4554-9b7f-03937699775a"
 tft_key = "RGAPI-eaba5c4f-0b41-40d7-8325-9a8cc6bad130"
 
 highElo = ["challenger", "grandmaster", "master"]

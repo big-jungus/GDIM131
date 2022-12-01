@@ -10,7 +10,9 @@ This method takes the dictionary returned from API_pull and creates a Excel shee
 
 def createFile(file_name, data):
     formattedData = formatData(data)
-    formattedData.to_excel(file_name, engine='xlsxwriter')
+    writer = pandas.ExcelWriter(file_name, engine='xlsxwriter')
+    formattedData.to_excel(writer, sheet_name = "Sheet1")
+    writer.close()
     return
 
 def appendData(file_name, data):
