@@ -224,6 +224,10 @@ def lowEloGames(rank, division, sample_size, num_games):
             player  = response.json()[random_index]["summonerName"]
             history = matchHistory(player, num_games)
             
+            if len(history) == 0:
+                break
+            
+            
             flag2 = False
             
             while flag2 == False:

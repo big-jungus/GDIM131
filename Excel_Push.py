@@ -8,12 +8,21 @@ This script focuses on the Excel pushing
 This method takes the dictionary returned from API_pull and creates a Excel sheet with data
 '''
 
-def createFile(file_name, data):
+def createFileNew(file_name, data):
     formattedData = formatData(data)
     writer = pandas.ExcelWriter(file_name, engine='xlsxwriter')
     formattedData.to_excel(writer, sheet_name = "Sheet1")
     writer.close()
     return
+
+
+
+def createFileClean(file_name, data):
+    writer = pandas.ExcelWriter(file_name, engine='xlsxwriter')
+    data.to_excel(writer, sheet_name = "Sheet1")
+    writer.close()
+    
+    
 
 def appendData(file_name, data):
     formattedData = formatData(data)
@@ -23,6 +32,8 @@ def appendData(file_name, data):
     writer.save()
     writer.close()
     return
+
+
 
 def formatData(data):
     dataframe = {"Set_Num": list(), "Rank": list(), "Division": list(), "MatchID": list(), "PlayerID": list(), "Placement": list(), "Level": list(), "Units": list(), "Traits": list()}
