@@ -23,7 +23,7 @@ if __name__ == '__main__':
     '''
     Pushing data to an Excel sheet
     '''
-    file_name = "TFT_Data_SS100_NG10_v2.xlsx"
+    file_name = "TFT_Data_SS100_NG10_v3.xlsx"
     Excel_Push.createFile(file_name, allData)
     
     
