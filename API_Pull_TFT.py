@@ -9,7 +9,8 @@ import random
 import time
 
 
-dev_key = "RGAPI-e222e5c1-e819-4554-9b7f-03937699775a"
+
+dev_key = "RGAPI-6dbd5c73-5f94-4b51-a22a-8a8ce90598c7"
 tft_key = "RGAPI-eaba5c4f-0b41-40d7-8325-9a8cc6bad130"
 
 highElo = ["challenger", "grandmaster", "master"]
@@ -73,28 +74,24 @@ def testFunction(rank, num_games):
 def dataCollection(sample_size, num_games):
     data = {}
     #high elo collection
+
     for rank in highElo:
         
-        gameIDs = highEloGames(rank, num_games)
+        gameIDs = highEloGames(rank, sample_size, num_games)
         
-        '''
-        gameIDs getting collected as something like ""\"NA_123456"\"", so needs to be cleaned to just have the NA_123456 portion
-        Plug the list of gameIDs into matchOrganize, which should sort the data into a dictionary
-        I didn't include the rank in the game dict, so add a dict entry with key "rank" and value of the rank variable from the for loop
-        Pass each game dict into the data dict
-        '''
         for game in gameIDs:
             matchID = game.replace('"','')
             time.sleep(1)
             try:
-                print("Data found for " + matchID)
                 gameData = matchOrganize(matchData(matchID))
                 gameData["matchID"] = matchID
                 gameData["rank"] = rank
                 gameData["division"] = "I"
                 data[game] = gameData
+                print("Data found for " + matchID)
             except KeyError:
                 print("Data not found for " + matchID)
+
         
 
     #low elo collection
@@ -106,12 +103,12 @@ def dataCollection(sample_size, num_games):
                 matchID = game.replace('"','')
                 time.sleep(1)
                 try:
-                    print("Data found for " + matchID)
                     gameData = matchOrganize(matchData(matchID))
                     gameData["matchID"] = matchID
                     gameData["rank"] = rank
                     gameData["division"] = division
                     data[game] = gameData
+                    print("Data found for " + matchID)
                 except KeyError:
                     print("Data not found for " + matchID)
     
@@ -124,6 +121,7 @@ def idTransfer(leagueID):
     response = requests.get("https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + properID + "?api_key=" + dev_key)
     
     #print(jsonText(response.json()))
+    
     return jsonText(response.json()["puuid"])
 
 
@@ -147,7 +145,7 @@ def matchHistory(leagueID, num_games):
 
 
 
-def highEloGames(rank, num_games):
+def highEloGames(rank, sample_size, num_games):
     if rank == "challenger":
         response = requests.get("https://na1.api.riotgames.com/tft/league/v1/challenger?api_key=" + tft_key)
     elif rank == "grandmaster":
@@ -161,23 +159,36 @@ def highEloGames(rank, num_games):
     print("Processing " + rank + " games. This will take a while.")
     
     unique_gameIDs = []
-    for player in response.json()["entries"]:
-        print("Entry " + str(response.json()["entries"].index(player) + 1) + " out of " + str(len(response.json()["entries"])) + " possible entries")
+    used_players = []
+    for x in range(sample_size):
+        flag1 = False
+        
+        while flag1 == False:
+            random_index = random.randint(0, len(response.json()["entries"]) - 1)
+            if random_index not in used_players:
+                used_players.append(random_index)
+                flag1 = True
+                
+        print("Entry " + str(x + 1) + " out of " + str(sample_size) + " possible entries")
         
         time.sleep(1)
         
         try:
-            history = matchHistory(player["summonerName"], num_games)
+            player = response.json()["entries"][random_index]["summonerName"]
+            history = matchHistory(player, num_games)
             
-            rand_game = jsonText(history[random.randint(0, num_games - 1)])
+            flag2 = False
             
-            if rand_game not in unique_gameIDs:
-                unique_gameIDs.append(rand_game)
+            while flag2 == False:
+                rand_game = jsonText(history[random.randint(0, len(history) - 1)])
+            
+                if rand_game not in unique_gameIDs:
+                    unique_gameIDs.append(rand_game)
+                    flag2 = True
+                
         except KeyError:
             print("Invalid Game.")
-            
-        if len(unique_gameIDs) == 100:
-            break
+
     
     print("Found " + str(len(unique_gameIDs)) + " games in " + rank)
     
@@ -207,29 +218,30 @@ def lowEloGames(rank, division, sample_size, num_games):
                 used_players.append(random_index)
                 flag = True
         
-        #basically pretty similar to highEloGames
-        #might need "entries" key, might not
-        
         time.sleep(1)
         
         try:
-            player  = response.json()[random_index]
-            history = matchHistory(player["summonerName"], num_games)
-            rand_game = jsonText(history[random.randint(0, len(history) - 1)])
+            player  = response.json()[random_index]["summonerName"]
+            history = matchHistory(player, num_games)
             
-            if rand_game not in unique_gameIDs:
-                unique_gameIDs.append(rand_game)
-                print("Entry " + str(x) + " out of " + str(sample_size) + " possible entries in " + rank + " " + division)
+            flag2 = False
+            
+            while flag2 == False:
+                rand_game = jsonText(history[random.randint(0, len(history) - 1)])
+                if rand_game not in unique_gameIDs:
+                    unique_gameIDs.append(rand_game)
+                    print("Entry " + str(x) + " out of " + str(sample_size) + " possible entries in " + rank + " " + division)
+                    flag2 = True
         except KeyError:
             print("Invalid Game")
         
-        if len(unique_gameIDs) == 100:
-            break
         
         if len(used_players) == len(response.json()):
             page_num += 1
             response = requests.get("https://na1.api.riotgames.com/tft/league/v1/entries/" + rank + "/" + division + "?page=" + str(page_num) + "&api_key=" + tft_key)
             used_players = []
+    
+    print("Found " + str(len(unique_gameIDs)) + " games in " + rank + " " + division)
     
     return unique_gameIDs
 

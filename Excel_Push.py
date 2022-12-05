@@ -37,8 +37,8 @@ def formatData(data):
             dataframe["PlayerID"].append(player)
             dataframe["Placement"].append(data[singleMatch]["players"][player]["placement"])
             dataframe["Level"].append(data[singleMatch]["players"][player]["level"])
-            dataframe["Units"].append(data[singleMatch]["players"][player]["units"])
-            dataframe["Traits"].append(data[singleMatch]["players"][player]["traits"])
+            dataframe["Units"].append(data[singleMatch]["players"][player]["units"].sort(key=lambda tup: tup[0]))
+            dataframe["Traits"].append(data[singleMatch]["players"][player]["traits"].sort(key=lambda tup: tup[0]))
     
     df = pandas.DataFrame(data=dataframe)
     print(df)
