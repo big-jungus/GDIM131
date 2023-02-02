@@ -218,6 +218,7 @@ def lowEloGames(rank, division, sample_size, num_games):
                 used_players.append(random_index)
                 flag = True
         
+        #Wait to account for Riot API rate limits
         time.sleep(1)
         
         try:
@@ -227,9 +228,7 @@ def lowEloGames(rank, division, sample_size, num_games):
             if len(history) == 0:
                 break
             
-            
             flag2 = False
-            
             while flag2 == False:
                 rand_game = jsonText(history[random.randint(0, len(history) - 1)])
                 if rand_game not in unique_gameIDs:
@@ -238,7 +237,6 @@ def lowEloGames(rank, division, sample_size, num_games):
                     flag2 = True
         except KeyError:
             print("Invalid Game")
-        
         
         if len(used_players) == len(response.json()):
             page_num += 1

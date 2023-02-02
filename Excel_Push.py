@@ -52,5 +52,5 @@ def formatData(data):
             dataframe["Traits"].append(sorted(data[singleMatch]["players"][player]["traits"], key=lambda tup: tup[0]))
     
     df = pandas.DataFrame(data=dataframe)
-    print(df)
+    
     return df
