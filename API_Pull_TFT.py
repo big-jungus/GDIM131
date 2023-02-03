@@ -10,8 +10,8 @@ import time
 
 
 
-dev_key = "RGAPI-6dbd5c73-5f94-4b51-a22a-8a8ce90598c7"
-tft_key = "RGAPI-eaba5c4f-0b41-40d7-8325-9a8cc6bad130"
+dev_key = ""
+tft_key = ""
 
 highElo = ["challenger", "grandmaster", "master"]
 lowElo = ["IRON", "BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND"]
